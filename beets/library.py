@@ -34,6 +34,7 @@ from beets import dbcore, logging, plugins, util
 from beets.dbcore import Results, types
 from beets.util import (
     MoveOperation,
+    ancestry,
     bytestring_path,
     cached_classproperty,
     normpath,
@@ -204,8 +205,12 @@ class PathType(types.Type[bytes, bytes]):
         """Create a path type object.
 
         `nullable` controls whether the type may be missing, i.e., None.
+        `rootdir` controls the root directory for relative paths
         """
         self.nullable = nullable
+        self.rootdir = bytestring_path(
+            normpath(beets.config["directory"].as_filename())
+        )
 
     @property
     def null(self):
@@ -233,12 +238,22 @@ class PathType(types.Type[bytes, bytes]):
             return value
 
     def from_sql(self, sql_value):
-        return self.normalize(sql_value)
+        if sql_value is None:
+            return None
+
+        b = bytes(sql_value)
+        if b.startswith(b"\0"):
+            value = os.path.join(self.rootdir, b[2:])
+        else:
+            value = b
+
+        return value
 
     def to_sql(self, value):
-        if isinstance(value, bytes):
-            value = BLOB_TYPE(value)
-        return value
+        value = self.normalize(value)
+        if self.rootdir in ancestry(value):
+            value = os.path.join(b"\0", os.path.relpath(value, self.rootdir))
+        return BLOB_TYPE(value)
 
 
 class MusicalKey(types.String):
