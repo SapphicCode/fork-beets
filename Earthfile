@@ -14,6 +14,7 @@ build:
     ARG branch=$tag
     RUN git switch -c tmp $tag
     RUN git cherry-pick a53fe00fe6026caf223d905960891cda60251ce9
+    RUN git rm -r .github && git commit -m 'ci: disable GitHub special files'
     RUN --push --secret remote \
         git remote add new-origin "$remote" && \
         git push --force new-origin tmp:$branch
