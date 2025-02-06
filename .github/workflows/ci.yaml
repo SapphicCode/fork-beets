@@ -5,7 +5,7 @@ name: Earthly +main
 on:
   push:
     branches:
-      - main
+      - ci
   workflow_dispatch:
 
 jobs:
