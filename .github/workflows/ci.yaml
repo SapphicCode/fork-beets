@@ -17,4 +17,4 @@ jobs:
         version: v0.8.15
     - uses: actions/checkout@v4
     - name: Run build
-      run: EARTHLY_SECRETS="remote=https://$GITHUB_TOKEN@github.com/SapphicCode/fork-beets" earthly --ci --push +main
+      run: EARTHLY_SECRETS="remote=https://SapphicCode:$GITHUB_TOKEN@github.com/SapphicCode/fork-beets" earthly --ci --push +main
