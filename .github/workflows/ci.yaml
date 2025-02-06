@@ -1,0 +1,17 @@
+# .github/workflows/ci.yml
+
+name: Earthly +main
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: earthly/actions-setup@v1
+      with:
+        version: v0.8.0
+    - uses: actions/checkout@v4
+    - name: Run build
+      run: earthly --ci --push +main
